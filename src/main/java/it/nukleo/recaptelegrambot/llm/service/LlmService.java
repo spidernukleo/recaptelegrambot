@@ -73,18 +73,9 @@ public class LlmService {
 
 
 
-    private String formatMessageForPrompt(TelegramMessageEntity message) {
-        return "[MID_%d][%s] %s: %s".formatted(
-                message.getMessageId(),
-                message.getSentAt(),
-                message.getUserFirstName(),
-                message.getText()
-        );
-    }
 
     private Path convertToWav(Path audioFile) throws Exception {
-        String fileName = audioFile.getFileName().toString();
-        String baseName = fileName.substring(0, fileName.lastIndexOf('.'));
+        String baseName = audioFile.getFileName().toString().replaceFirst("[.][^.]+$", "");
         Path wavFile = audioFile.getParent().resolve(baseName + ".wav");
 
         ProcessBuilder pb = new ProcessBuilder(
@@ -106,6 +97,16 @@ public class LlmService {
 
         return wavFile;
 
+    }
+
+
+    private String formatMessageForPrompt(TelegramMessageEntity message) {
+        return "[MID_%d][%s] %s: %s".formatted(
+                message.getMessageId(),
+                message.getSentAt(),
+                message.getUserFirstName(),
+                message.getText()
+        );
     }
 
     private String loadPrompt(String path) {

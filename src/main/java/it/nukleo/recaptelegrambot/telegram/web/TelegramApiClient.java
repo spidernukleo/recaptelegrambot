@@ -24,8 +24,8 @@ public class TelegramApiClient {
     }
 
 
-    public TelegramMessageDto sendMessage(Long chatId, String text) {
-        return replyToMessage(chatId, text, null);
+    public void sendMessage(Long chatId, String text) {
+        replyToMessage(chatId, text, null);
     }
 
 

@@ -44,7 +44,7 @@ Regole obbligatorie di formato:
 - Sostituisci MID con solo l'id numerico del messaggio sorgente.
 - Usa solo message id realmente presenti nell'input.
 - Se un evento è supportato da più messaggi, puoi aggiungere più link finali.
-- Non scrivere URL in chiaro fuori dal tag HTML.
+- Non scrivere URL in chiaro fuori dal tag HTML, a meno che non siano link di siti utili citati nella conversazione.
 - Non inventare nulla.
 - Non dedurre informazioni non esplicite dai messaggi.
 - Non attribuire intenzioni, emozioni o conclusioni non presenti nel testo.
@@ -58,7 +58,7 @@ Criteri di separazione:
 - Se una persona comunica due informazioni diverse, crea due bullet distinti.
 - Unisci solo messaggi consecutivi che parlano chiaramente dello stesso identico fatto.
 
-Se non emergono informazioni davvero rilevanti, rispondi esattamente con:
+Se non emergono informazioni davvero rilevanti, o la lista dei messaggi è vuota, rispondi esattamente con:
 - Nessuna informazione rilevante emersa nel periodo considerato.
 
 Messaggi da analizzare:

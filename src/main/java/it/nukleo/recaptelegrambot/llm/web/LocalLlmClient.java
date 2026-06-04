@@ -37,11 +37,7 @@ public class LocalLlmClient implements LlmClient {
 
 
     private String doTranscription(Path audioFile) throws Exception {
-        String fileName = audioFile.getFileName().toString();
-        String baseName = fileName.substring(0, fileName.lastIndexOf('.'));
-
-        Path outputBase = audioFile.getParent().resolve(baseName);
-        Path txtFile = audioFile.getParent().resolve(baseName + ".txt");
+        String baseName = audioFile.getFileName().toString().replaceFirst("[.][^.]+$", "");
 
         ProcessBuilder pb = new ProcessBuilder(
                 properties.getCliPath(),
@@ -49,7 +45,7 @@ public class LocalLlmClient implements LlmClient {
                 "-f", audioFile.toAbsolutePath().toString(),
                 "-l", properties.getLanguage(),
                 "--output-txt",
-                "-of", outputBase.toAbsolutePath().toString()
+                "-of", audioFile.getParent().resolve(baseName).toAbsolutePath().toString()
         );
 
         pb.redirectErrorStream(true);
@@ -63,16 +59,16 @@ public class LocalLlmClient implements LlmClient {
             throw new IllegalStateException("whisper-cli failed with exit code " + exitCode);
         }
 
-        String transcription;
+        Path txtFile = audioFile.getParent().resolve(baseName + ".txt");
 
-        if(Files.exists(txtFile)){
-            transcription = Files.readString(txtFile).trim();
-            Files.delete(txtFile);
-        }
-        else{
-            transcription = "Trascrizione non riuscita.";
+        if (!Files.exists(txtFile)) {
+            Files.deleteIfExists(audioFile);
+            throw new IllegalStateException("no txt output fount");
         }
 
+        String transcription = Files.readString(txtFile).trim();
+
+        Files.deleteIfExists(txtFile);
         Files.deleteIfExists(audioFile);
 
         return transcription;

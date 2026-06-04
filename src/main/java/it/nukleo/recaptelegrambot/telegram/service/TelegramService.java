@@ -31,6 +31,8 @@ public class TelegramService {
     private final TelegramMessageRepository telegramMessageRepository;
     private final TelegramApiClient telegramApiClient;
     private final LlmService llmService;
+    private final Path appDir = new ApplicationHome(getClass()).getDir().toPath();
+
 
     public void handleUpdate(TelegramUpdateDto update) throws Exception {
         if(update.getMessage() != null) {
@@ -73,12 +75,8 @@ public class TelegramService {
 
         String filePath = telegramApiClient.getFilePath(message.getVoice().getFileId());
         byte[] audioBytes = telegramApiClient.downloadFile(filePath);
-
-        String fileName = Path.of(filePath).getFileName().toString();
-        String extension = fileName.contains(".") ? fileName.substring(fileName.lastIndexOf('.')) : "";
-
-        Path appDir = new ApplicationHome(getClass()).getDir().toPath();
-        Path savedFile = appDir.resolve("voice-" + messageId + chatId +extension);
+        String extension = Path.of(filePath).getFileName().toString().replaceFirst("^[^.]+", "");
+        Path savedFile = appDir.resolve("voice-" + messageId + chatId + extension);
         Files.write(savedFile, audioBytes);
 
         llmService.generateTranscription(savedFile)
@@ -153,32 +151,30 @@ public class TelegramService {
 
         List<TelegramMessageEntity> messages = telegramMessageRepository.findMessagesByDuration(chatId, from, to);
 
-        if (!messages.isEmpty()) {
-            llmService.generateRecap(messages, null)
-                    .thenAccept(result ->
-                            telegramApiClient.sendMessage(senderId, "<b>Recap delle ultime 24 ore</b>\n" + result)
-                    ).exceptionally(ex -> {
-                        telegramApiClient.sendMessage(senderId, "Errore durante la generazione del recap.");
-                        System.out.println(ex.getMessage());
-                        return null;
-                    });
-        }
+        llmService.generateRecap(messages, null)
+                .thenAccept(result ->
+                        telegramApiClient.sendMessage(senderId, "<b>Recap delle ultime 24 ore</b>\n" + result)
+                ).exceptionally(ex -> {
+                    telegramApiClient.sendMessage(senderId, "Errore durante la generazione del recap.");
+                    System.out.println(ex.getMessage());
+                    return null;
+                });
+
     }
 
     private void sendLastMessagesRecap(Long chatId, Long senderId, int limit) {
         List<TelegramMessageEntity> messages = telegramMessageRepository.findMessagesByLimit(chatId, PageRequest.of(0, limit));
 
-        if (!messages.isEmpty()) {
-            llmService.generateRecap(messages, null)
-                    .thenAccept(result ->
-                            telegramApiClient.sendMessage(senderId, "<b>Recap degli ultimi " + limit + " messaggi</b>\n" + result)
-                    )
-                    .exceptionally(ex -> {
-                        telegramApiClient.sendMessage(senderId, "Errore durante la generazione del recap.");
-                        System.out.println(ex.getMessage());
-                        return null;
-                    });
-        }
+
+        llmService.generateRecap(messages, null)
+                .thenAccept(result ->
+                        telegramApiClient.sendMessage(senderId, "<b>Recap degli ultimi " + limit + " messaggi</b>\n" + result)
+                )
+                .exceptionally(ex -> {
+                    telegramApiClient.sendMessage(senderId, "Errore durante la generazione del recap.");
+                    System.out.println(ex.getMessage());
+                    return null;
+                });
     }
 
     private void sendKeywordRecap(Long chatId, Long senderId, String keyword) {
@@ -188,16 +184,15 @@ public class TelegramService {
 
         List<TelegramMessageEntity> messages = telegramMessageRepository.findMessagesByDuration(chatId, from, to);
 
-        if (!messages.isEmpty()) {
-            llmService.generateRecap(messages, keyword)
-                    .thenAccept(result ->
-                            telegramApiClient.sendMessage(senderId, "<b>Recap delle ultime 24 ore per: " + keyword + "</b>\n" + result)
-                    ).exceptionally(ex -> {
-                        telegramApiClient.sendMessage(senderId, "Errore durante la generazione del recap.");
-                        System.out.println(ex.getMessage());
-                        return null;
-                    });
-        }
+
+        llmService.generateRecap(messages, keyword)
+                .thenAccept(result ->
+                        telegramApiClient.sendMessage(senderId, "<b>Recap delle ultime 24 ore per: " + keyword + "</b>\n" + result)
+                ).exceptionally(ex -> {
+                    telegramApiClient.sendMessage(senderId, "Errore durante la generazione del recap.");
+                    System.out.println(ex.getMessage());
+                    return null;
+                });
     }
 
     private void sendTimeRangeRecap(Long chatId, Long senderId, long amount, String unit) {
@@ -213,17 +208,15 @@ public class TelegramService {
 
         List<TelegramMessageEntity> messages = telegramMessageRepository.findMessagesByDuration(chatId, from, to);
 
-        if (!messages.isEmpty()) {
-            llmService.generateRecap(messages, null)
-                    .thenAccept(result ->
-                            telegramApiClient.sendMessage(senderId, "<b>Recap degli ultimi " + amount + unit + "</b>\n" + result)
-                    )
-                    .exceptionally(ex -> {
-                        telegramApiClient.sendMessage(senderId, "Errore durante la generazione del recap.");
-                        System.out.println(ex.getMessage());
-                        return null;
-                    });
-        }
+        llmService.generateRecap(messages, null)
+                .thenAccept(result ->
+                        telegramApiClient.sendMessage(senderId, "<b>Recap degli ultimi " + amount + unit + "</b>\n" + result)
+                )
+                .exceptionally(ex -> {
+                    telegramApiClient.sendMessage(senderId, "Errore durante la generazione del recap.");
+                    System.out.println(ex.getMessage());
+                    return null;
+                });
     }
 
 
