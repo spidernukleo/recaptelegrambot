@@ -65,9 +65,11 @@ public class LlmService {
 
         String keywordPrompt = (keyword == null) ? "" : recapKeywordPrompt.replace("${KEYWORD}", keyword.trim());
 
+        String chatId = messages.isEmpty() ? "null" : messages.getFirst().getChatId().toString().substring(4);
+
         return recapBasePrompt
                 .replace("${KEYWORD}", keywordPrompt)
-                .replace("${CHAT_ID}", messages.getFirst().getChatId().toString().substring(4))
+                .replace("${CHAT_ID}", chatId)
                 .replace("${MESSAGES}", messagesText);
     }
 

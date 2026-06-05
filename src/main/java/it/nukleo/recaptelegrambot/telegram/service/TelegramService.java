@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.system.ApplicationHome;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -33,6 +34,7 @@ public class TelegramService {
     private final TelegramApiClient telegramApiClient;
     private final LlmService llmService;
     private final StringRedisTemplate redisTemplate;
+    private final TaskScheduler taskScheduler;
     private final Path appDir = new ApplicationHome(getClass()).getDir().toPath();
 
 
@@ -62,6 +64,12 @@ public class TelegramService {
         /// COMANDI DA QUA
         if (text.toLowerCase().startsWith("/recap")){
             handleRecap(message);
+
+            taskScheduler.schedule(
+                    () -> telegramApiClient.deleteMessage(message.getChat().getId(), message.getMessageId()),
+                    Instant.now().plusSeconds(5)
+            );
+
             return;
         }
 

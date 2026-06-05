@@ -1,6 +1,7 @@
 package it.nukleo.recaptelegrambot.telegram.web;
 
 import it.nukleo.recaptelegrambot.config.TelegramBotProperties;
+import it.nukleo.recaptelegrambot.telegram.dto.request.TelegramDeleteMessageDto;
 import it.nukleo.recaptelegrambot.telegram.dto.request.TelegramSendMessageDto;
 import it.nukleo.recaptelegrambot.telegram.dto.request.TelegramSendReactionDto;
 import it.nukleo.recaptelegrambot.telegram.dto.response.*;
@@ -78,6 +79,19 @@ public class TelegramApiClient {
                 .body(byte[].class);
 
         return file;
+    }
+
+    public void deleteMessage(Long chatId, Long messageId) {
+        TelegramDeleteMessageDto dto = new TelegramDeleteMessageDto();
+        dto.setChatId(chatId);
+        dto.setMessageId(messageId);
+
+        telegramRestClient.post()
+                .uri("/deleteMessage")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(dto)
+                .retrieve()
+                .toBodilessEntity();
     }
 
 
