@@ -3,6 +3,7 @@ package it.nukleo.recaptelegrambot.telegram.persistence.repository;
 import it.nukleo.recaptelegrambot.telegram.persistence.entity.TelegramMessageEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -33,5 +34,4 @@ public interface TelegramMessageRepository extends JpaRepository<TelegramMessage
             @Param("chatId") Long chatId,
             Pageable pageable
     );
-
 }

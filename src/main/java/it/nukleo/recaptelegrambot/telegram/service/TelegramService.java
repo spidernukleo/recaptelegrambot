@@ -11,6 +11,7 @@ import it.nukleo.recaptelegrambot.telegram.persistence.repository.TelegramMessag
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.system.ApplicationHome;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ public class TelegramService {
     private final TelegramMessageRepository telegramMessageRepository;
     private final TelegramApiClient telegramApiClient;
     private final LlmService llmService;
+    private final StringRedisTemplate redisTemplate;
     private final Path appDir = new ApplicationHome(getClass()).getDir().toPath();
 
 
@@ -98,6 +100,12 @@ public class TelegramService {
         Long messageId = message.getMessageId();
         Long senderId = message.getFrom().getId();
 
+        String key = "recap:cooldown:" + chatId + ":" + senderId;
+        if(!redisTemplate.opsForValue().setIfAbsent(key, "1", Duration.ofMinutes(10))){
+            telegramApiClient.sendReaction(chatId, messageId, "👎");
+            return;
+        }  //ANTIFLOOD RECAP
+
         String[] parts = message.getText().trim().split("\\s+");
 
         if (parts.length > 2) { /// MASSIMO UN ARG AMMESSO
@@ -145,6 +153,14 @@ public class TelegramService {
     }
 
     private void sendLast24hRecap(Long chatId, Long senderId){
+        String cacheKey = "recap:24h:" + chatId;
+
+        String cachedRecap = redisTemplate.opsForValue().get(cacheKey);
+        if (cachedRecap != null) {
+            telegramApiClient.sendMessage(senderId, "<b>Recap delle ultime 24 ore</b>\n" + cachedRecap);
+            return;
+        }
+
         Duration duration = Duration.ofHours(24);
         LocalDateTime to = LocalDateTime.now();
         LocalDateTime from = to.minus(duration);
@@ -152,9 +168,10 @@ public class TelegramService {
         List<TelegramMessageEntity> messages = telegramMessageRepository.findMessagesByDuration(chatId, from, to);
 
         llmService.generateRecap(messages, null)
-                .thenAccept(result ->
-                        telegramApiClient.sendMessage(senderId, "<b>Recap delle ultime 24 ore</b>\n" + result)
-                ).exceptionally(ex -> {
+                .thenAccept(result -> {
+                            telegramApiClient.sendMessage(senderId, "<b>Recap delle ultime 24 ore</b>\n" + result);
+                            redisTemplate.opsForValue().set(cacheKey, result, Duration.ofMinutes(2));
+                }).exceptionally(ex -> {
                     telegramApiClient.sendMessage(senderId, "Errore durante la generazione del recap.");
                     System.out.println(ex.getMessage());
                     return null;
@@ -163,14 +180,22 @@ public class TelegramService {
     }
 
     private void sendLastMessagesRecap(Long chatId, Long senderId, int limit) {
+        String cacheKey = "recap:"+limit+"-mex:" + chatId;
+
+        String cachedRecap = redisTemplate.opsForValue().get(cacheKey);
+        if (cachedRecap != null) {
+            telegramApiClient.sendMessage(senderId, "<b>Recap degli ultimi " + limit + " messaggi</b>\n" + cachedRecap);
+            return;
+        }
+
         List<TelegramMessageEntity> messages = telegramMessageRepository.findMessagesByLimit(chatId, PageRequest.of(0, limit));
 
 
         llmService.generateRecap(messages, null)
-                .thenAccept(result ->
-                        telegramApiClient.sendMessage(senderId, "<b>Recap degli ultimi " + limit + " messaggi</b>\n" + result)
-                )
-                .exceptionally(ex -> {
+                .thenAccept(result -> {
+                            telegramApiClient.sendMessage(senderId, "<b>Recap degli ultimi " + limit + " messaggi</b>\n" + result);
+                            redisTemplate.opsForValue().set(cacheKey, result, Duration.ofMinutes(2));
+                }).exceptionally(ex -> {
                     telegramApiClient.sendMessage(senderId, "Errore durante la generazione del recap.");
                     System.out.println(ex.getMessage());
                     return null;
@@ -178,6 +203,14 @@ public class TelegramService {
     }
 
     private void sendKeywordRecap(Long chatId, Long senderId, String keyword) {
+        String cacheKey = "recap:"+keyword+"-keyword:" + chatId;
+
+        String cachedRecap = redisTemplate.opsForValue().get(cacheKey);
+        if (cachedRecap != null) {
+            telegramApiClient.sendMessage(senderId, "<b>Recap delle ultime 24 ore per: " + keyword + "</b>\n" + cachedRecap);
+            return;
+        }
+
         Duration duration = Duration.ofHours(24);
         LocalDateTime to = LocalDateTime.now();
         LocalDateTime from = to.minus(duration);
@@ -186,9 +219,10 @@ public class TelegramService {
 
 
         llmService.generateRecap(messages, keyword)
-                .thenAccept(result ->
-                        telegramApiClient.sendMessage(senderId, "<b>Recap delle ultime 24 ore per: " + keyword + "</b>\n" + result)
-                ).exceptionally(ex -> {
+                .thenAccept(result ->{
+                        telegramApiClient.sendMessage(senderId, "<b>Recap delle ultime 24 ore per: " + keyword + "</b>\n" + result);
+                    redisTemplate.opsForValue().set(cacheKey, result, Duration.ofMinutes(2));
+                }).exceptionally(ex -> {
                     telegramApiClient.sendMessage(senderId, "Errore durante la generazione del recap.");
                     System.out.println(ex.getMessage());
                     return null;
@@ -196,6 +230,14 @@ public class TelegramService {
     }
 
     private void sendTimeRangeRecap(Long chatId, Long senderId, long amount, String unit) {
+        String cacheKey = "recap:"+amount+unit+":" + chatId;
+
+        String cachedRecap = redisTemplate.opsForValue().get(cacheKey);
+        if (cachedRecap != null) {
+            telegramApiClient.sendMessage(senderId, "<b>Recap degli ultimi " + amount + unit + "</b>\n" + cachedRecap);
+            return;
+        }
+
         Duration duration = switch (unit) {
             case "m" -> Duration.ofMinutes(amount);
             case "h" -> Duration.ofHours(amount);
@@ -209,8 +251,10 @@ public class TelegramService {
         List<TelegramMessageEntity> messages = telegramMessageRepository.findMessagesByDuration(chatId, from, to);
 
         llmService.generateRecap(messages, null)
-                .thenAccept(result ->
-                        telegramApiClient.sendMessage(senderId, "<b>Recap degli ultimi " + amount + unit + "</b>\n" + result)
+                .thenAccept(result -> {
+                            telegramApiClient.sendMessage(senderId, "<b>Recap degli ultimi " + amount + unit + "</b>\n" + result);
+                            redisTemplate.opsForValue().set(cacheKey, result, Duration.ofMinutes(2));
+                        }
                 )
                 .exceptionally(ex -> {
                     telegramApiClient.sendMessage(senderId, "Errore durante la generazione del recap.");
