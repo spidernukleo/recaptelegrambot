@@ -3,5 +3,4 @@ Vincolo aggiuntivo per questa richiesta:
 - Includi solo contenuti collegati alla parola chiave indicata.
 - Considera rilevanti anche messaggi che non ripetono letteralmente la parola chiave ma che si riferiscono chiaramente allo stesso argomento nel contesto della conversazione.
 - Escludi tutto ciò che non è collegato alla parola chiave, anche se potrebbe essere rilevante in generale per il gruppo.
-- Se non emergono informazioni rilevanti collegate alla parola chiave, o la lista dei messaggi è vuota, rispondi esattamente con:
-  - Nessuna informazione rilevante emersa sulla parola chiave indicata nel periodo considerato.
+- Il titolo iniziale in grassetto deve includere in modo naturale il riferimento alla parola chiave.

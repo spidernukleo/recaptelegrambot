@@ -1,64 +1,48 @@
-Devi analizzare messaggi di una chat Telegram e produrre un recap sintetico per eventi distinti.
+Analizza i messaggi di una chat Telegram e produci un recap sintetico degli eventi rilevanti emersi nel periodo considerato.
 
 Contesto:
-La chat appartiene principalmente a un gruppo universitario.
-Devi quindi dare priorità alle informazioni utili per la vita accademica, per esempio:
+La chat appartiene principalmente a un gruppo universitario. Dai priorità a informazioni utili per gli studenti, come:
 - lezioni annullate o spostate
 - cambi di aula
-- orari delle lezioni o degli esami
+- orari di lezioni o esami
 - date, scadenze, consegne, prenotazioni
 - comunicazioni di professori, tutor o rappresentanti
 - informazioni su esami, appelli, risultati, ricevimenti
 - materiali didattici, file, dispense, link utili
-- indicazioni organizzative importanti per gli studenti
+- indicazioni organizzative importanti
 
-Puoi includere anche altri eventi o discussioni non strettamente universitarie solo se risultano chiaramente utili, concrete o rilevanti.
-Non dare importanza a rumore conversazionale, battute, saluti, messaggi vuoti, reazioni, commenti casuali o chiacchiere senza utilità pratica.
-
-Obiettivo:
-estrarre solo fatti, eventi, decisioni, aggiornamenti o richieste rilevanti emersi nei messaggi.
-
-Criteri di selezione:
-- Dai priorità massima alle informazioni universitarie e organizzative.
-- Includi richieste utili solo se contengono un'informazione concreta o un bisogno rilevante per gli studenti.
-- Escludi messaggi ripetitivi se non aggiungono nuove informazioni.
-- Escludi conversazioni generiche che non producono un fatto utile o recuperabile.
+Puoi includere anche altri contenuti solo se chiaramente utili e concreti. Escludi rumore conversazionale, saluti, battute, reazioni, commenti casuali e messaggi ripetitivi che non aggiungono informazioni.
 
 ${KEYWORD}
 
-Regole obbligatorie di formato:
-- Rispondi solo in italiano.
-- Rispondi solo in testo semplice.
-- Ogni riga deve iniziare con "- ".
-- Ogni riga deve descrivere un solo evento, fatto, aggiornamento o argomento rilevante.
-- Ogni riga deve contenere sempre il nome della persona o delle persone coinvolte, se presenti nei messaggi.
-- Se ci sono più persone coinvolte nello stesso evento, scrivile esplicitamente.
-- Se i partecipanti sono molti, puoi scrivere "X, Y e altri" oppure "più partecipanti (X, Y, altri)".
-- Mantieni ogni bullet breve, concreto, informativo e facile da consultare.
-- Se utile, puoi aggiungere un breve dettaglio tra parentesi alla fine del bullet.
-- Le parentesi devono contenere solo dettagli brevi e rilevanti, per esempio una data, un luogo, un orario, una scadenza o un chiarimento utile.
-- Non usare parentesi per aggiungere commenti, interpretazioni o dettagli superflui.
-- Alla fine di ogni bullet devi aggiungere almeno un link cliccabile al messaggio sorgente.
-- Ogni link deve essere in formato HTML, usando esattamente questa struttura:
-  <a href="https://t.me/c/${CHAT_ID}/MID">[*]</a>
-- Sostituisci MID con solo l'id numerico del messaggio sorgente.
-- Usa solo message id realmente presenti nell'input.
-- Se un evento è supportato da più messaggi, puoi aggiungere più link finali.
-- Non scrivere URL in chiaro fuori dal tag HTML, a meno che non siano link di siti utili citati nella conversazione.
+Regole di contenuto:
+- Estrai solo fatti, eventi, decisioni, aggiornamenti o richieste davvero rilevanti.
 - Non inventare nulla.
-- Non dedurre informazioni non esplicite dai messaggi.
-- Non attribuire intenzioni, emozioni o conclusioni non presenti nel testo.
-- Non scrivere introduzioni, conclusioni, titoli o testo fuori dai bullet.
-- Usa solo le informazioni presenti nei messaggi forniti.
-- Se un'informazione non è presente chiaramente nei messaggi, non inserirla nel recap.
-
-Criteri di separazione:
-- Se cambia argomento, crea un nuovo bullet.
-- Se cambia il fatto raccontato, crea un nuovo bullet.
-- Se una persona comunica due informazioni diverse, crea due bullet distinti.
+- Non dedurre informazioni non esplicite.
+- Usa solo ciò che è chiaramente presente nei messaggi.
+- Se un'informazione non è chiara, non inserirla.
+- Se cambia argomento o fatto, crea un nuovo bullet.
 - Unisci solo messaggi consecutivi che parlano chiaramente dello stesso identico fatto.
 
-Se non emergono informazioni davvero rilevanti, o la lista dei messaggi è vuota, rispondi esattamente con:
+Formato obbligatorio:
+- Rispondi solo in italiano.
+- Rispondi solo in testo compatibile con HTML Telegram.
+- La prima riga deve essere un titolo in grassetto HTML:
+  <b>...</b>
+- Il titolo deve descrivere il periodo effettivamente coperto dai messaggi:
+  - stesso giorno: <b>Recap dei messaggi dalle 14:32 alle 18:07</b>
+  - giorni diversi: <b>Recap dei messaggi dal 05/06 14:32 al 06/06 09:10</b>
+- Dopo il titolo, ogni riga deve iniziare con "- ".
+- Ogni bullet deve descrivere un solo fatto o argomento rilevante.
+- Ogni bullet deve includere i nomi delle persone coinvolte, se presenti.
+- Se utile, puoi aggiungere un dettaglio breve tra parentesi, solo se concreto e rilevante.
+- Alla fine di ogni bullet aggiungi almeno un link al messaggio sorgente in questo formato:
+  <a href="https://t.me/c/${CHAT_ID}/MID">[*]</a>
+- Usa solo message id realmente presenti nei messaggi forniti.
+- Non scrivere altro testo fuori dal titolo e dai bullet.
+
+Se non emergono informazioni rilevanti, o i messaggi sono vuoti, rispondi esattamente con:
+<b>Recap del periodo considerato</b>
 - Nessuna informazione rilevante emersa nel periodo considerato.
 
 Messaggi da analizzare:

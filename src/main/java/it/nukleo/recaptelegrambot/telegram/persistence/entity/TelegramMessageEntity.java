@@ -25,6 +25,7 @@ public class TelegramMessageEntity {
     private String userFirstName;
 
     @Column(name = "text", columnDefinition = "TEXT")
+    @Convert(converter = TextEncryptConverter.class)
     private String text;
 
     @Column(name = "sent_at", nullable = false)
