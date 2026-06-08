@@ -32,7 +32,7 @@ Formato obbligatorio:
 - Il titolo deve descrivere il periodo effettivamente coperto dai messaggi:
   - stesso giorno: <b>Recap dei messaggi dalle 14:32 alle 18:07</b>
   - giorni diversi: <b>Recap dei messaggi dal 05/06 14:32 al 06/06 09:10</b>
-- Dopo il titolo, ogni riga deve iniziare con "- ".
+- Dopo il titolo, ogni riga deve iniziare con "- NOME"
 - Ogni bullet deve descrivere un solo fatto o argomento rilevante.
 - Ogni bullet deve includere i nomi delle persone coinvolte, se presenti.
 - Se utile, puoi aggiungere un dettaglio breve tra parentesi, solo se concreto e rilevante.
