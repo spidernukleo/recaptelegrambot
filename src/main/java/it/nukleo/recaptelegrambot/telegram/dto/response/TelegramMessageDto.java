@@ -16,7 +16,6 @@ public class TelegramMessageDto {
 
     private String text;
 
-    @JsonProperty("date")
     private Long date;
 
     @JsonProperty("reply_to_message")

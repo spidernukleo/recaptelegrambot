@@ -11,14 +11,6 @@ public class TelegramVoiceDto {
     @JsonProperty("file_id")
     private String fileId;
 
-    @JsonProperty("file_unique_id")
-    private String fileUniqueId;
-
-    private Integer duration;
-
     @JsonProperty("mime_type")
     private String mimeType;
-
-    @JsonProperty("file_size")
-    private Long fileSize;
 }

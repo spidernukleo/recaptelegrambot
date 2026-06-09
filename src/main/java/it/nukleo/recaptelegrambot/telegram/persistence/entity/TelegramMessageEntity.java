@@ -11,7 +11,14 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "telegram_message")
+@Table(
+        name = "telegram_message",
+        indexes = {
+                @Index(name = "idx_telegram_message_chat_id", columnList = "chat_id"),
+                @Index(name = "idx_telegram_message_sent_at", columnList = "sent_at"),
+                @Index(name = "idx_telegram_message_message_id", columnList = "message_id")
+        }
+)
 @Entity
 public class TelegramMessageEntity {
     @Id
