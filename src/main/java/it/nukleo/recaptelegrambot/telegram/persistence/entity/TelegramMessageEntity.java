@@ -15,8 +15,7 @@ import java.time.LocalDateTime;
         name = "telegram_message",
         indexes = {
                 @Index(name = "idx_telegram_message_chat_id", columnList = "chat_id"),
-                @Index(name = "idx_telegram_message_sent_at", columnList = "sent_at"),
-                @Index(name = "idx_telegram_message_message_id", columnList = "message_id")
+                @Index(name = "idx_telegram_message_sent_at", columnList = "sent_at")
         }
 )
 @Entity
@@ -28,10 +27,10 @@ public class TelegramMessageEntity {
     @Column(name="chat_id", nullable = false)
     private Long chatId;
 
-    @Column(name = "user_first_name")
+    @Column(name = "user_first_name", nullable = false)
     private String userFirstName;
 
-    @Column(name = "text", columnDefinition = "TEXT")
+    @Column(name = "text", columnDefinition = "TEXT", nullable = false)
     @Convert(converter = TextEncryptConverter.class)
     private String text;
 
