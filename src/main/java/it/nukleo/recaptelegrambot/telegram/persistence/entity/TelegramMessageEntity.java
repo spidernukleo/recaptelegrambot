@@ -28,6 +28,7 @@ public class TelegramMessageEntity {
     private Long chatId;
 
     @Column(name = "user_first_name", nullable = false)
+    @Convert(converter = TextEncryptConverter.class)
     private String userFirstName;
 
     @Column(name = "text", columnDefinition = "TEXT", nullable = false)
